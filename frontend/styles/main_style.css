@@ -1,0 +1,50 @@
+header {
+    background-color: white;
+
+    margin-left: -2.5vw;
+    margin-top: -5.2vh;
+
+    padding-top: 0.5vh;
+    padding-bottom: 0.4vh;
+
+    width: 105.4%;
+    height: 5vh;
+}
+
+body {
+    background-color: #060AB3;
+
+    margin: 50px;
+
+    font-family: "Roboto Light", sans-serif;
+    text-align: center;
+
+
+}
+
+.main{
+    background-color: white;
+    border-radius: 0 0 2vh 2vh;
+
+    margin-top: 0.4vh;
+    padding: 0.5vh;
+
+    min-height: 87vh;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.links{
+
+}
+
+a {
+    color: #060AB3;
+    text-decoration: none;
+    font-size: x-large;
+    padding-bottom: 1vh;
+}
