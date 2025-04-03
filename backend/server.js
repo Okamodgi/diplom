@@ -25,14 +25,14 @@ app.post('/api/check-user', async (req, res) => {
     try {
         const { snils } = req.body;
 
-        // Проверяем, существует ли пользователь с таким СНИЛС в таблице users
-        const queryResult = await pool.query('SELECT * FROM users WHERE snils=$1', [snils]);
+        // Проверяем, существует ли пользователь с этим СНИЛС в таблице
+        const queryResult = await pool.query('SELECT * FROM abiturients WHERE snils=$1', [snils]);
 
         if (queryResult.rowCount > 0) {
-            // Пользователь найден
+
             res.status(200).json({ message: 'Пользователь найден' });
         } else {
-            // Пользователь не найден
+
             res.status(404).json({ error: 'Пользователь не найден' });
         }
     } catch (error) {
