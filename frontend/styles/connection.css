@@ -1,0 +1,16 @@
+p{
+    padding-top: 10%;
+    text-align:center;
+    line-height: inherit;
+}
+.adres{
+    padding-top: 5%;
+    text-align:left;
+    line-height: inherit;
+    padding-left: 20%;
+}
+.map{
+    margin-left: 25%;
+    margin-right: 25%;
+
+}
