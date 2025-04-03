@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация и Вход</title>
+    <link rel="stylesheet" href="../styles/login.css">
+    <link rel="stylesheet" href="../styles/main_style.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+</head>
+
+<body>
+<div class="left_side_bar">
+    <button class="back_btn"></button>
+</div>
+<div class="main_full">
+    <div class="login_logo">
+        <img src="../static/images/PKIPT_logo.png">
+    </div>
+    <div class="login_form">
+        <div>
+            <div id="login_tab" class="tab active" onClick="showTab('login')">Вход</div>
+            <div id="register_tab" class="tab" onClick="showTab('registration')">Регистрация</div>
+        </div>
+
+        <!-- Вход -->
+        <div id="password_container" class="input-block password-container" style="display: block;">
+            <div class="input-block">
+                <hr class="hr-line">
+                <input id="snils" type="text" placeholder="Введите ваш СНИЛС" required>
+                <button onclick="handle Login()">Войти</button>
+            </div>
+        </div>
+
+        <!-- Регистрация -->
+        <div id="registration_container" class="input-block registration-container" style="display: none;">
+            <hr class="hr-line">
+            <input id="snils_input" type="text" placeholder="Введите ваш СНИЛС" required>
+            <input id="full_name" type="text" placeholder="Введите ваше ФИО" required>
+            <input id="phone" type="tel" placeholder="Введите ваш номер телефона" required>
+
+            <div class="checkbox-container">
+                <input type="checkbox" id="agreement">
+                <label for="agreement">Я даю согласие на <a href="/agreement" target="_blank">обработку персональных данных</a></label>
+            </div>
+            <button id="send_code_btn" onClick="sendCode()">Отправить код на почту</button>
+            <div id="code_container" style="display:none;">
+                <div class="input-block">
+                    <input id="verification_code" type="text" placeholder="Введите код с почты" required>
+                    <button id="confirm_code_btn" onClick="$.post('/auth/verification_code', {verification_code: $('#verification_code').val()})
+                        .done((data, status, jqXHR) => {
+                            if (jqXHR.status === 200) {
+                                $('#finalize_container').show();
+                                $('#code_container').hide();
+                            }
+                        })
+                        .fail((jqXHR) => {
+                            if (jqXHR.status === 403) {
+                                alert('Неверный код. Пожалуйста, попробуйте еще раз.');
+                                $('#verification_code').val('');
+                            }
+                        });">Подтвердить код</button>
+                </div>
+            </div>
+            <div id="finalize_container" style="display:none;">
+                <div class="input-block">
+                    <input id="password" type="password" placeholder="Пароль" required>
+                    <button id="register_btn" data-type="user" onclick="handleRegister()">Зарегистрироваться</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="right_side_bar">
+
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#login_button').on('click', handleLogin);  // Обработчик события для кнопки "Войти"
+
+        if (new URLSearchParams(window.location.search).has('register')) showTab('registration');
+        if ($.cookie('snils') || $.cookie('full_name') || $.cookie('phone')) {
+            showTab($.cookie('tab'));
+            $('#snils_input').val($.cookie('snils'));
+            $('#full_name').val($.cookie('full_name'));
+            $('#phone').val($.cookie('phone'));
+        }
+        console.log($.cookie('snils'), $.cookie('full_name'), $.cookie('phone'))
+    });
+
+    $(document).ready(function() {
+        if (new URLSearchParams(window.location.search).has('register')) showTab('registration');
+        if ($.cookie('snils') || $.cookie('full_name') || $.cookie('phone')) {
+            showTab($.cookie('tab'));
+            $('#snils_input').val($.cookie('snils'));
+            $('#full_name').val($.cookie('full_name'));
+            $('#phone').val($.cookie('phone'));
+        }
+        console.log($.cookie('snils'), $.cookie('full_name'), $.cookie('phone'))
+    });
+
+    $(document).ready(function() {
+        $('.back_btn').on('click', function() {
+            console.log("Кнопка нажата");
+            window.location.href = '../index.html';
+        });
+    });
+    function showTab(tab) {
+        console.log(tab);
+        if (tab === 'login') {
+            $('#password_container').show();
+            $('#registration_container').hide();
+            $('#company_register_btn').hide();
+            $('#login_tab').addClass('active');
+            $('#register_tab').removeClass('active');
+        } else{
+            if(tab === 'registration'){
+                $('#password_container').hide();
+                $('#registration_container').show();
+                $('#name_input').attr('placeholder', 'Имя');
+                $('#last_name').show();
+                //$('#email').show();
+
+                $('#organization_type').hide();
+                $('#company_register_btn').show(); // Показываем кнопку при активации вкладки регистрации
+
+
+                $('#login_tab').removeClass('active');
+                $('#register_tab').addClass('active');
+            }
+        }
+
+        function validateFields(isCompany) {
+            let isValid = true;
+            if (isCompany) {
+
+                console.log($('#phone_input'));
+                console.log($('#email'));
+                console.log($('#name_input'));
+                if (!$('#name_input').val().trim() || !$('#email').val().trim() ||  !$('#phone_input').val().trim() || (!$('#school').prop('checked') && !$('#organization').prop('checked'))) {
+                    alert('Заполните все поля.');
+                    isValid = false;
+                }
+            } else {
+                // Проверка для работника
+                if (!$('#name_input').val().trim() || !$('#last_name').val().trim() || !$('#email').val().trim()) {
+                    alert('Заполните все поля.');
+                    isValid = false;
+                }
+            }
+            return isValid;
+        }
+
+        function sendCode() {
+            if (!$('#agreement').prop('checked')) {
+                return alert('Вы не приняли согласие на обработку персональных данных');
+            }
+            const isCompany = $('#register_btn').attr('data-type') === 'company';
+            if (validateFields(isCompany)) {
+                // Если поля валидны, отправляем код
+                $.post('/auth/mail', {email: $('#email').val()})
+                    .done((data, status, jqXHR) => {
+                        if (jqXHR.status === 201) {
+                            //$.cookie('tab', )
+                            $.cookie('tab', isCompany ? 'registrationCom/Shc' : 'registrtion');
+                            $.cookie('access_token', data.access_token);
+                            $.cookie('name', $('#name_input').val());
+                            $.cookie('last_name', $('#last_name').val());
+                            $.cookie('email', $('#email').val());
+                            $.cookie('phone', $('#phone_input').val());
+                            console.log($('#phone_input').val());
+                            //type = $('input[name="org_type"]:checked').attr('id');
+                            $.cookie('type', $('#school').prop('checked') ? 'school' : $('#school').prop('checked') ? 'organization' : 'not_selected');
+                            console.log($('#school').prop('checked') ? 'school' : 'organization');
+                            console.log($.cookie('type'));
+                            //$.cookie('type', (type === 'school') ? 'school' : (type === 'organization') ? 'organization' : 'not_selected');
+                            $('#code_container').show();
+                        }
+                    })
+                    .fail((jqXHR) => {
+                        if (jqXHR.status === 302) {
+                            $('#password_container').show();
+                            $('#registration_container').hide();
+                            alert('уже есть')
+                        }
+                        if (jqXHR.status === 400) {
+                            alert('Неверная почта. Пожалуйста, попробуйте еще раз.');
+                        }
+                    });
+            }
+        }
+
+        function handleRegister() {
+            const registerType = $('#register_btn').attr('data-type');
+            if (registerType === 'user') {
+                registerUser();
+            } else {
+                registerNotUser();
+            }
+        }
+
+        function delCookie(){
+            $.removeCookie('name');
+            $.removeCookie('last_name');
+            $.removeCookie('email');
+            $.removeCookie('phone');
+            $.removeCookie('type');
+            $.removeCookie('tab');
+        }
+
+        function handleLogin() {
+            var snils = $('#snils').val();
+
+            $.ajax({
+                url: '/api/check-user',
+                method: 'POST',
+                data: {
+                    snils: snils
+                },
+                success: function(response) {
+                    if (response.message === 'Пользователь найден') {
+                        // Пользователь найден, переходим на index.html
+                        window.location.href = '/index.html';
+                    } else {
+                        // Пользователь не найден, выводим ошибку
+                        alert('Неверный СНИЛС!');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }}
+</script>
+</body>
+</html>

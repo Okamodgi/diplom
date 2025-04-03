@@ -1,30 +1,59 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Название придумай сама</title>
-        <link rel="stylesheet" href="styles/main_style.css">
-    </head>
-    <header>
-        <div class="navbar">
-            <div class="logo">
-                <img src="" alt="">
-            </div>
-            <div class="links">
-                <a href="">О колледже</a>
-            </div>
-        </div>
-    </header>
-    <body>
-        <div class="main">
-            <h1>Главная страница</h1>
-            <button id="btn">Получить данные</button>
-            <p id="output"></p>
-            <script src="scripts/script.js"></script>
-        </div>
-    </body>
-    <footer>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Абитуриент_ГАПОУ по ПКИПТ</title>
+    <link rel="stylesheet" href="styles/main_style.css">
+    <link rel="stylesheet" href="styles/index.css">
 
-    </footer>
+</head>
+<header>
+    <div class="navbar">
+        <div class="logo">
+            <img src="static/images/PKIPT_logo.png" alt="">
+        </div>
+
+        <div class="links">
+            <a href="">О колледже</a>
+            <a href="">Для абитуриентов</a>
+            <a href="">Связь с нами</a>
+        </div>
+
+        <div class="user-profile">
+            <a href="pages/login.html"><img src="static/images/user_login_icon.png"></a>
+        </div>
+
+    </div>
+</header>
+<body>
+<div class="main">
+    <div class="card-container">
+        <div class="card" id="c1">
+            <img src="static/images/c1_bg.png">
+        </div>
+        <div class="card" id="c2">
+            <img src="static/images/c2_bg.png">
+        </div>
+        <!--
+        <div class="card" id="c3">
+            <img src="static/images/c1_bg.png">
+        </div><div class="card" id="c4">
+            <img src="static/images/c1_bg.png">
+        </div>
+        -->
+    </div>
+</div>
+</body>
+<footer>
+
+</footer>
 </html>
+<script> 
+    $(document).ready(function() {
+    $('.back_btn').on('click', function() {
+        console.log("Кнопка нажата");
+        window.location.href = '../index.html';
+    });
+});
+</script>

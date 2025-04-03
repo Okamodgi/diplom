@@ -1,36 +1,33 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+
+}
 header {
     background-color: white;
-
-    margin-left: -2.5vw;
-    margin-top: -5.2vh;
-
-    padding-top: 0.5vh;
-    padding-bottom: 0.4vh;
-
-    width: 105.4%;
-    height: 5vh;
+    width: 100%;
+    height: 10%;
+    margin-bottom: 5px;
 }
 
-body {
+body{
     background-color: #060AB3;
-
-    margin: 50px;
-
     font-family: "Roboto Light", sans-serif;
     text-align: center;
-
-
+    width: 100%;
+    height: 100%;
 }
 
 .main{
     background-color: white;
-    border-radius: 0 0 2vh 2vh;
-
-    margin-top: 0.4vh;
-    padding: 0.5vh;
-
-    min-height: 87vh;
+    border-radius: 0 0 1vw 1vw;
+    margin-left: 5%;
+    margin-right: 5%;
+    min-height: 89%;
 }
+
 
 button {
     padding: 10px 20px;
@@ -38,13 +35,52 @@ button {
     cursor: pointer;
 }
 
+.navbar{
+    display: flex;
+    height: 100%;
+    justify-content: space-between;
+    align-content: center;
+    flex-wrap: wrap;
+    align-items: center; 
+}
+
+.logo{
+    display: inline-flex;
+    float: left;
+}
+
+.logo > img {
+    width: 5vw;
+}
+
 .links{
+    display: flex;
+    width: 70%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.links > a {
+    display: block;
+    color: #060AB3;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: xx-large;
+    width: fit-content;
 
 }
 
-a {
-    color: #060AB3;
-    text-decoration: none;
-    font-size: x-large;
-    padding-bottom: 1vh;
+.user-profile{
+    display: inline-flex;
+    float: right;
+}
+
+.user-profile > a > img {
+    width: 4vw;
+}
+
+
+h1{
+    padding: 0;
+    margin: 0;
 }
