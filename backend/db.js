@@ -11,7 +11,7 @@ const pool = new Pool({
 async function checkConnection() {
     try {
         await pool.connect();
-        console.log('Подключение к базе данных успешно установлено.');
+        console.log('Подключение к базе данных успешно установлено!');
     } catch (err) {
         console.error('Ошибка подключения к базе данных:', err.message);
     }
