@@ -1,0 +1,52 @@
+h2{
+    margin-top: 0;
+    padding-top: 2rem;
+}
+
+.docs{
+    margin: auto;
+    width: 80%;
+    text-align: left;
+    padding-bottom: 2rem;
+}
+
+li {
+    list-style: none;
+    position: relative;
+    padding-left: 3rem; /* Отступ для иконки */
+    margin-bottom: 0.5rem;
+}
+
+.docx::before,
+.pdf::before {
+    content: "";
+    display: inline-block;
+    width: 3rem; /* Контролируемый размер */
+    height: 2.5rem;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.docx::before {
+    background-image: url(../static/images/docx-icon.svg);
+}
+
+.pdf::before {
+    background-image: url(../static/images/pdf-icon.svg);
+}
+
+a{
+    display: block;
+    text-decoration: none;
+    font-size: 1.2rem;
+    margin: 1rem;
+    width: fit-content;
+}
+
+a:visited, a:active, a {
+    color: #060AB3;
+}

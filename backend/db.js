@@ -17,6 +17,26 @@ async function checkConnection() {
     }
 }
 
+async function ensureIndexes() {
+    await pool.query(`
+        CREATE INDEX IF NOT EXISTS idx_abiturients_snils 
+        ON abiturients(snils)
+    `);
+}
+
+ensureIndexes();
+
 checkConnection();
+
+async function checkIndexes() {
+    const res = await pool.query(`
+        SELECT indexname 
+        FROM pg_indexes 
+        WHERE tablename = 'abiturients'
+          AND indexdef LIKE '%snils%'
+    `);
+    console.log('Индексы для snils:', res.rows);
+}
+checkIndexes();
 
 module.exports = pool;

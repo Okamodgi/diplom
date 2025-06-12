@@ -1,10 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет абитуриента | ГАПОУ по ПКИПТ</title>
+    <link rel="stylesheet" href="../styles/main_style.css">
+    <link rel="stylesheet" href="../styles/LK_abiturient.css">
+    <script src="../scripts/header.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+<header>
+    <div class="navbar">
+        <div class="logo">
+            <a href="../index.html"><img src="../static/images/PKIPT_logo.png" alt="Логотип ПКИПТ"></a>
+        </div>
 
+        <div class="links">
+            <a href="../pages/info_colleg.html">О колледже</a>
+            <a href="../pages/info_abiturient.html">Для абитуриентов</a>
+            <a href="../pages/connection.html">Связь с нами</a>
+        </div>
+
+        <div class="user-profile">
+            <button></button>
+        </div>
+    </div>
+</header>
+
+<div class="main">
+    <div class="lk-container">
+        <h1>Личный кабинет абитуриента</h1>
+
+        <div class="user-card">
+            <div class="user-info">
+                <div class="info-item">
+                    <span class="info-label">ФИО:</span>
+                    <span id="userFio" class="info-value">Загрузка...</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">СНИЛС:</span>
+                    <span id="userSnils" class="info-value">Загрузка...</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Телефон:</span>
+                    <span id="userPhone" class="info-value">Загрузка...</span>
+                </div>
+            </div>
+
+            <button id="editBtn" class="action-btn">Изменить телефон</button>
+            <button id="logoutBtn" class="logoutBtn">Выйти</button>
+        </div>
+
+        <div class="edit-form" id="editForm" style="display: none;">
+            <h2>Изменение телефона</h2>
+            <div class="form-group">
+                <label for="editPhone">Новый телефон:</label>
+                <input type="tel" id="editPhone" placeholder="+7 (XXX) XXX-XX-XX">
+            </div>
+            <div class="form-actions">
+                <button id="saveBtn" class="action-btn">Сохранить</button>
+                <button id="cancelBtn" class="action-btn cancel">Отмена</button>
+            </div>
+        </div>
+
+        <div class="actions-card">
+            <h2>Действия</h2>
+            <div class="action-buttons">
+                <button class="action-btn">Подать заявление</button>
+                <button class="action-btn">Проверить статус</button>
+                <button class="action-btn">Мои документы</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>© 2025 ГАПОУ ПО ПКИПТ</p>
+    </div>
+</footer>
+
+<script>
+    $(document).ready(function() {
+        // Получаем SNILS из URL или localStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        const snils = urlParams.get('snils') || localStorage.getItem('userSnils');
+
+        if (!snils) {
+            alert('Пользователь не авторизован');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Загрузка данных пользователя
+        function loadUserData() {
+            $.get(`http://localhost:3000/api/LK_abiturient/${snils}`)
+                .done(function(data) {
+                    $('#userFio').text(data.fio || 'Не указано');
+                    $('#userSnils').text(data.snils || 'Не указан');
+                    $('#userPhone').text(data.number_t || 'Не указан');
+                    $('#editPhone').val(data.number_t || '');
+                })
+                .fail(function() {
+                    alert('Ошибка загрузки данных пользователя');
+                });
+        }
+
+        // Инициализация
+        loadUserData();
+
+        // Обработчики кнопок
+        $('#editBtn').click(function() {
+            $('.user-card').hide();
+            $('#editForm').show();
+        });
+
+        $('#cancelBtn').click(function() {
+            $('#editForm').hide();
+            $('.user-card').show();
+        });
+
+        $('#saveBtn').click(function() {
+            const newPhone = $('#editPhone').val();
+
+            $.ajax({
+                url: `http://localhost:3000/api/LK_abiturient/${snils}`,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({ number_t: newPhone }),
+                success: function() {
+                    alert('Телефон успешно обновлён');
+                    loadUserData();
+                    $('#editForm').hide();
+                    $('.user-card').show();
+                },
+                error: function() {
+                    alert('Ошибка при обновлении телефона');
+                }
+            });
+        });
+
+        $('#logoutBtn').click(function() {
+            localStorage.removeItem('userSnils');
+            if (window.opener) {
+                window.opener.postMessage({ type: 'userLoggedOut' }, '*');
+            }
+            window.location.href = '../index.html';
+        });
+
+    });
+</script>
 </body>
 </html>

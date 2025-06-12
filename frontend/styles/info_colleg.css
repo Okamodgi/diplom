@@ -1,0 +1,11 @@
+.info {
+    padding-bottom: 0.1%;
+    height: 90%;
+    text-align: justify;
+}
+
+.info > img {
+    padding: 1%;
+    width: 90%;
+    height: 90%;
+}

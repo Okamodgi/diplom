@@ -1,10 +1,442 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет администратора | ГАПОУ по ПКИПТ</title>
+    <link rel="stylesheet" href="../styles/main_style.css">
+    <link rel="stylesheet" href="../styles/LK_admin.css">
+    <script src="../scripts/header.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 </head>
 <body>
+<header>
+    <div class="navbar">
+        <div class="logo">
+            <a href="../index.html"><img src="../static/images/PKIPT_logo.png" alt="Логотип ПКИПТ"></a>
+        </div>
 
+        <div class="links">
+            <a href="../pages/info_colleg.html">О колледже</a>
+            <a href="../pages/info_abiturient.html">Для абитуриентов</a>
+            <a href="../pages/connection.html">Связь с нами</a>
+        </div>
+
+        <div class="user-profile">
+            <button></button>
+        </div>
+    </div>
+</header>
+
+<div class="main">
+    <div class="lk-container">
+        <h1>Личный кабинет администратора</h1>
+        <div class="user-card">
+            <div class="user-info">
+                <div class="info-item">
+                    <span class="info-label">Логин:</span>
+                    <button id="logoutBtn" class="logoutBtn">Выйти</button>
+                    <span id="adminLogin" class="info-value">Загрузка...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-card">
+            <h2>Действия</h2>
+            <div class="action-buttons">
+                <button id="addUserBtn" class="action-btn">Добавить абитуриента</button>
+                <button id="viewUsersBtn" class="action-btn">Просмотр абитуриентов</button>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="edit-form" id="addUserForm">
+                <div id="start_container">
+                    <h2>Добавление абитуриента</h2>
+                    <div class="form-group">
+                        <label for="full_name">ФИО:</label>
+                        <input type="text" id="full_name" placeholder="Введите ФИО" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="snils_input">СНИЛС:</label>
+                        <input type="text" id="snils_input" placeholder="Введите СНИЛС" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Телефон:</label>
+                        <input type="tel" id="phone" placeholder="+7 (XXX) XXX-XX-XX" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input id="email" type="email" placeholder="Введите ваш email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="average_score">Средний балл аттестата:</label>
+                        <input type="number" id="average_score" min="1" max="5" step="0.1" placeholder="Введите средний балл" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Выберите специальности (максимум 3):</label>
+                        <div class="specialities-wrapper">
+                            <div id="checkbox-specialities" class="checkbox-list">
+                                <!-- Чекбоксы будут загружены здесь -->
+                            </div>
+                            <div id="selected-count" class="selected-count">Выбрано: 0/3</div>
+                        </div>
+                        <!-- Скрытый select для совместимости
+                        <select id="specialities" multiple style="display: none;"></select>-->
+                    </div>
+                    <div class="form-actions">
+                        <!-- Упрощенная форма добавления<button id="send_code_btn" class="action-btn">Отправить код на почту</button>-->
+                        <button id="confirmAddBtn" class="action-btn">Добавить</button>
+                        <button id="cancelAddBtn" class="action-btn cancel">Отмена</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Таблица абитуриентов -->
+        <div class="users-table" id="usersTable" style="display: none;">
+            <h2>Список абитуриентов</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>ФИО</th>
+                    <th>СНИЛС</th>
+                    <th>Телефон</th>
+                    <th>Средний балл</th>
+                    <th colspan="2">Действия</th>
+                </tr>
+                </thead>
+                <tbody id="usersList">
+                <!-- Данные будут загружаться здесь -->
+                </tbody>
+            </table>
+            <button id="closeTableBtn" class="action-btn cancel">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <p>© 2025 ГАПОУ ПО ПКИПТ</p>
+    </div>
+</footer>
+
+<script>
+    $(document).ready(function() {
+        // Проверка авторизации
+        const adminLogin = localStorage.getItem('adminLogin');
+        if (!adminLogin) {
+            window.location.href = 'login.html';
+            return;
+        }
+        // Загрузка специальностей при открытии формы
+        $('#addUserBtn').click(function() {
+            $('#modalOverlay').show();
+            $('#usersTable').hide();
+            loadSpecialities();
+        });
+        // Ограничение выбора специальностей
+        $('#specialities').change(function() {
+            const selected = $(this).val() || [];
+            if (selected.length > 3) {
+                alert('Можно выбрать не более 3 специальностей');
+                $(this).val(selected.slice(0, 3));
+            }
+            updateSelectedSpecialitiesDisplay();
+        });
+
+        function updateSelectedSpecialitiesDisplay() {
+            const selected = $('#specialities').val() || [];
+            $('#selectedSpecialities').html(
+                selected.map(spec => `<div>${spec}</div>`).join('')
+            );
+        }
+
+        function loadSpecialities() {
+            console.log("Загрузка специальностей...");
+            $.get('http://localhost:3000/api/specialities')
+                .done(function(data) {
+                    console.log("Получены данные:", data);
+                    const container = $('#checkbox-specialities').empty();
+                    //const select = $('#specialities').empty();
+
+                    if (data.length === 0) {
+                        container.append('<div class="no-specialities">Нет доступных специальностей</div>');
+                        return;
+                    }
+
+                    data.forEach(spec => {
+                        // Добавляем в скрытый select
+                        //select.append(`<option value="${spec.id}">${spec.name}</option>`);
+
+                        // Добавляем чекбоксы
+                        container.append(`
+                    <div class="checkbox-item">
+                        <input type="checkbox"
+                               id="spec-${spec.id}"
+                               value="${spec.id}"
+                               class="spec-checkbox">
+                        <label for="spec-${spec.id}">${spec.name_spec}</label>
+                    </div>
+                `);
+                    });
+
+                    // Инициализация обработчиков
+                    $('.spec-checkbox').change(function() {
+                        updateSelectedSpecialities();
+                    });
+                })
+                .fail(function(jqXHR, textStatus, error) {
+                    console.error("Ошибка загрузки:", textStatus, error);
+                    $('#checkbox-specialities').html(
+                        '<div class="error">Ошибка загрузки списка специальностей</div>'
+                    );
+                });
+        }
+        function updateSelectedSpecialities() {
+            const selected = [];
+            $('.spec-checkbox:checked').each(function() {
+                selected.push($(this).val());
+            });
+
+            // Обновляем счетчик
+            const countElement = $('#selected-count');
+            countElement.text(`Выбрано: ${selected.length}/3`);
+
+            // Блокировка при достижении лимита
+            if (selected.length >= 3) {
+                countElement.addClass('limit-reached');
+                $('.spec-checkbox:not(:checked)').prop('disabled', true);
+            } else {
+                countElement.removeClass('limit-reached');
+                $('.spec-checkbox').prop('disabled', false);
+            }
+
+            // Синхронизация с select
+            $('#specialities').val(selected);
+        }
+
+        // Отображение логина
+        $('#adminLogin').text(adminLogin);
+
+
+        $('#viewUsersBtn').click(function() {
+            loadUsersList();
+            $('#usersTable').show();
+            $('#modalOverlay').hide();
+        });
+
+        $('#cancelAddBtn').click(function() {
+            $('#modalOverlay').hide();
+        });
+
+        $('#closeTableBtn').click(function() {
+            $('#usersTable').hide();
+        });
+
+        $('#logoutBtn').click(function() {
+            localStorage.removeItem('adminLogin');
+            window.location.href = '../index.html';
+        });
+
+
+        // Добавление нового абитуриента
+        /*$('#confirm_code_btn').on('click', function() {
+            const email = $('#email').val();
+            const verification_code = $('#verification_code').val();
+
+            if (!email || !verification_code) {
+                return alert('Пожалуйста, введите email и код подтверждения');
+            }
+
+            $.ajax({
+                url: 'http://localhost:3000/auth/verification_code',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    email: email,
+                    verification_code: verification_code
+                }),
+                success: function(data, status, jqXHR) {
+                    if (jqXHR.status === 200) {
+                        //$('#finalize_container').show();
+                        handleRegister();
+                        $('#modalOverlay').hide();
+                    }
+                },
+                error: function(jqXHR) {
+                    if (jqXHR.status === 403) {
+                        alert('Неверный код. Пожалуйста, попробуйте еще раз.');
+                        $('#verification_code').val('');
+                    } else if (jqXHR.status === 400) {
+                        alert(jqXHR.responseJSON.error || 'Необходимо указать email и код подтверждения');
+                    } else {
+                        alert('Произошла ошибка. Пожалуйста, попробуйте позже.');
+                    }
+                }
+            });
+        });*/
+        $('#confirmAddBtn').click(function() {
+            handleRegister();
+        });
+
+        // Загрузка списка абитуриентов
+        function loadUsersList() {
+            $.get('http://localhost:3000/api/users')
+                .done(function(data) {
+                    const tbody = $('#usersList').empty();
+                    data.forEach(user => {
+                        tbody.append(`
+                    <tr>
+                        <td>${user.fio || 'Не указано'}</td>
+                        <td>${user.snils || 'Не указан'}</td>
+                        <td>${user.number_t || 'Не указан'}</td>
+                        <td>${user.attestat || 'Не указан'}</td>
+                        <td colspan="2">
+                            <button class="action-btn small" onclick="editUser('${user.snils}')">Изменить</button>
+                            <button class="action-btn small cancel" onclick="deleteUser('${user.snils}')">Удалить</button>
+                        </td>
+                    </tr>
+                `);
+                    });
+                })
+                .fail(function() {
+                    alert('Ошибка загрузки списка абитуриентов');
+                });
+        }
+
+        function validateFields() {
+            if (!$('#snils_input').val().trim() ||
+                !$('#full_name').val().trim() ||
+                !$('#phone').val().trim() ||
+                !$('#email').val().trim() ||
+                !$('#average_score').val().trim()) {
+                alert('Заполните все обязательные поля.');
+                return false;
+            }
+            const selectedCount = $('.spec-checkbox:checked').length;
+            if (selectedCount === 0) {
+                alert('Выберите хотя бы одну специальность');
+                return false;
+            }
+            return true;
+        }
+
+        /*
+        function sendCode() {
+            const email = $('#email').val();
+            if (!email) {
+                return alert('Пожалуйста, введите email');
+            }
+
+            if (validateFields()) {
+                $.ajax({
+                    url: 'http://localhost:3000/auth/mail',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        email: email,
+                        snils: $('#snils_input').val(),
+                        full_name: $('#full_name').val(),
+                        phone: $('#phone').val(),
+                        average_score: $('#average_score').val(),
+                        specialities: $('#specialities').val()
+                    }),
+                    success: function(data, status, jqXHR) {
+                        if (jqXHR.status === 201) {
+                            $.cookie('tab', 'registration');
+                            $.cookie('snils', $('#snils_input').val());
+                            $.cookie('full_name', $('#full_name').val());
+                            $.cookie('phone', $('#phone').val());
+                            $.cookie('email', email);
+                            $.cookie('average_score', $('#average_score').val());
+                            $.cookie('specialities', JSON.stringify($('#specialities').val()));
+                            $('#start_container').hide();
+                            $('#code_container').show();
+                            alert('Код подтверждения отправлен на ваш email');
+                        }
+                    },
+                    error: function(jqXHR) {
+                        // ... существующий обработчик ошибок ...
+                    }
+                });
+            }
+        }*/
+
+        function handleRegister() {
+            if (!validateFields()) return;
+
+            const email = $('#email').val();
+            //const verification_code = $('#verification_code').val();
+            const snils = $('#snils_input').val().replace(/\D/g, '');
+            const full_name = $('#full_name').val();
+            const phone = $('#phone').val();
+            const attestat = $('#average_score').val().toString();
+            const specialities = $('#specialities').val();
+
+            /*if (!email || !verification_code) {
+                return alert('Пожалуйста, введите email и код подтверждения');
+            }*/
+
+            $.ajax({
+                url: 'http://localhost:3000/auth/register',
+                //url: 'http://localhost:3000/api/add-abiturient',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    snils: snils,
+                    full_name: full_name,
+                    phone: phone,
+                    email: email,
+                    //verification_code: verification_code,
+                    attestat: attestat,
+                    specialities: specialities
+                }),
+                success: function(data, status, jqXHR) {
+                    if (jqXHR.status === 201) {
+                        $.removeCookie('tab');
+                        $.removeCookie('snils');
+                        $.removeCookie('full_name');
+                        $.removeCookie('phone');
+                        $.removeCookie('email');
+                        $.removeCookie('average_score');
+                        $.removeCookie('specialities');
+                        alert('Абитуриент успешно добавлен!');
+                        $('#modalOverlay').hide();
+                        loadUsersList(); // Обновляем список
+                    }
+                },
+                error: function(jqXHR) {
+                    alert(jqXHR.responseJSON.error || 'Ошибка при добавлении абитуриента');
+                }
+            });
+        }
+
+
+        // Глобальные функции для кнопок в таблице
+        window.editUser = function(snils) {
+            // Реализация редактирования
+            prompt('Редактирование пользователя', 'Функция в разработке');
+        };
+
+        window.deleteUser = function(snils) {
+            if (confirm('Вы уверены, что хотите удалить этого абитуриента?')) {
+                $.ajax({
+                    url: `http://localhost:3000/api/delete-abiturient/${snils}`,
+                    method: 'DELETE',
+                    success: function() {
+                        alert('Абитуриент удален');
+                        loadUsersList();
+                    },
+                    error: function() {
+                        alert('Ошибка при удалении абитуриента');
+                    }
+                });
+            }
+        };
+    });
+</script>
 </body>
 </html>

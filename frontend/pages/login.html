@@ -13,7 +13,7 @@
 
 <body>
 <div class="left_side_bar">
-    <button class="back_btn"></button>
+    <img class="back_btn" src="../static/images/back_btn_img.png">
 </div>
 <div class="main_full">
     <div class="login_logo">
@@ -21,219 +21,133 @@
     </div>
     <div class="login_form">
         <div>
-            <div id="login_tab" class="tab active" onClick="showTab('login')">Вход</div>
-            <div id="register_tab" class="tab" onClick="showTab('registration')">Регистрация</div>
+            <div id="login_tab" class="tab active" onClick="showTab('login')">Вход абитуриентам</div>
+            <div id="admin_tab" class="tab" onClick="showTab('admin')">Вход администратора</div>
         </div>
 
-        <!-- Вход -->
+        <!-- Вход абитуриента-->
         <div id="password_container" class="input-block password-container" style="display: block;">
             <div class="input-block">
                 <hr class="hr-line">
                 <input id="snils" type="text" placeholder="Введите ваш СНИЛС" required>
-                <button onclick="">Войти</button>
+                <button id="login_button">Войти</button>
             </div>
         </div>
 
-        <!-- Регистрация -->
-        <div id="registration_container" class="input-block registration-container" style="display: none;">
-            <hr class="hr-line">
-            <input id="snils_input" type="text" placeholder="Введите ваш СНИЛС" required>
-            <input id="full_name" type="text" placeholder="Введите ваше ФИО" required>
-            <input id="phone" type="tel" placeholder="Введите ваш номер телефона" required>
-
-            <div class="checkbox-container">
-                <input type="checkbox" id="agreement">
-                <label for="agreement">Я даю согласие на <a href="/agreement" target="_blank">обработку персональных данных</a></label>
-            </div>
-            <button id="send_code_btn" onClick="sendCode()">Отправить код на почту</button>
-            <div id="code_container" style="display:none;">
-                <div class="input-block">
-                    <input id="verification_code" type="text" placeholder="Введите код с почты" required>
-                    <button id="confirm_code_btn" onClick="$.post('/auth/verification_code', {verification_code: $('#verification_code').val()})
-                        .done((data, status, jqXHR) => {
-                            if (jqXHR.status === 200) {
-                                $('#finalize_container').show();
-                                $('#code_container').hide();
-                            }
-                        })
-                        .fail((jqXHR) => {
-                            if (jqXHR.status === 403) {
-                                alert('Неверный код. Пожалуйста, попробуйте еще раз.');
-                                $('#verification_code').val('');
-                            }
-                        });">Подтвердить код</button>
-                </div>
-            </div>
-            <div id="finalize_container" style="display:none;">
-                <div class="input-block">
-                    <input id="password" type="password" placeholder="Пароль" required>
-                    <button id="register_btn" data-type="user" onclick="handleRegister()">Зарегистрироваться</button>
-                </div>
+        <!-- Вход админа -->
+        <div id="admin_container" class="input-block admin-container" style="display: none;">
+            <div>
+                <hr class="hr-line">
+                <input id="admin_login" type="text" placeholder="Введите логин администратора" required>
+                <input id="admin_password" type="password" placeholder="Введите пароль" required>
+                <button id="admin_login_button">Войти</button>
             </div>
         </div>
     </div>
 </div>
-<div class="right_side_bar">
-
-</div>
+<div class="right_side_bar"></div>
 
 <script>
     $(document).ready(function() {
-        $('#login_button').on('click', handleLogin);  // Обработчик события для кнопки "Войти"
-
-        if (new URLSearchParams(window.location.search).has('register')) showTab('registration');
-        if ($.cookie('snils') || $.cookie('full_name') || $.cookie('phone')) {
-            showTab($.cookie('tab'));
-            $('#snils_input').val($.cookie('snils'));
-            $('#full_name').val($.cookie('full_name'));
-            $('#phone').val($.cookie('phone'));
+        // Проверка параметров URL и куков
+        if (new URLSearchParams(window.location.search).has('register')) {
+            showTab('registration');
         }
-        console.log($.cookie('snils'), $.cookie('full_name'), $.cookie('phone'))
-    });
 
-    $(document).ready(function() {
-        if (new URLSearchParams(window.location.search).has('register')) showTab('registration');
         if ($.cookie('snils') || $.cookie('full_name') || $.cookie('phone')) {
-            showTab($.cookie('tab'));
-            $('#snils_input').val($.cookie('snils'));
-            $('#full_name').val($.cookie('full_name'));
-            $('#phone').val($.cookie('phone'));
+            showTab($.cookie('tab') || 'login');
+            $('#snils_input').val($.cookie('snils') || '');
+            $('#full_name').val($.cookie('full_name') || '');
+            $('#phone').val($.cookie('phone') || '');
+            $('#email').val($.cookie('email') || '');
         }
-        console.log($.cookie('snils'), $.cookie('full_name'), $.cookie('phone'))
-    });
 
-    $(document).ready(function() {
+        // Обработчик кнопки "Назад"
         $('.back_btn').on('click', function() {
-            console.log("Кнопка нажата");
             window.location.href = '../index.html';
         });
-    });
-    function showTab(tab) {
-        console.log(tab);
-        if (tab === 'login') {
-            $('#password_container').show();
-            $('#registration_container').hide();
-            $('#company_register_btn').hide();
-            $('#login_tab').addClass('active');
-            $('#register_tab').removeClass('active');
-        } else{
-            if(tab === 'registration'){
-                $('#password_container').hide();
-                $('#registration_container').show();
-                $('#name_input').attr('placeholder', 'Имя');
-                $('#last_name').show();
-                //$('#email').show();
 
-                $('#organization_type').hide();
-                $('#company_register_btn').show(); // Показываем кнопку при активации вкладки регистрации
+        // Обработчик кнопки входа абитуриента
+        $('#login_button').on('click', handleLogin);
 
+        // Обработчик кнопки входа админа
+        $('#admin_login_button').on('click', function() {
+            const login = $('#admin_login').val();
+            const password = $('#admin_password').val();
 
-                $('#login_tab').removeClass('active');
-                $('#register_tab').addClass('active');
+            if (!login || !password) {
+                return alert('Введите логин и пароль');
             }
-        }
-
-        function validateFields(isCompany) {
-            let isValid = true;
-            if (isCompany) {
-
-                console.log($('#phone_input'));
-                console.log($('#email'));
-                console.log($('#name_input'));
-                if (!$('#name_input').val().trim() || !$('#email').val().trim() ||  !$('#phone_input').val().trim() || (!$('#school').prop('checked') && !$('#organization').prop('checked'))) {
-                    alert('Заполните все поля.');
-                    isValid = false;
-                }
-            } else {
-                // Проверка для работника
-                if (!$('#name_input').val().trim() || !$('#last_name').val().trim() || !$('#email').val().trim()) {
-                    alert('Заполните все поля.');
-                    isValid = false;
-                }
-            }
-            return isValid;
-        }
-
-        function sendCode() {
-            if (!$('#agreement').prop('checked')) {
-                return alert('Вы не приняли согласие на обработку персональных данных');
-            }
-            const isCompany = $('#register_btn').attr('data-type') === 'company';
-            if (validateFields(isCompany)) {
-                // Если поля валидны, отправляем код
-                $.post('/auth/mail', {email: $('#email').val()})
-                    .done((data, status, jqXHR) => {
-                        if (jqXHR.status === 201) {
-                            //$.cookie('tab', )
-                            $.cookie('tab', isCompany ? 'registrationCom/Shc' : 'registrtion');
-                            $.cookie('access_token', data.access_token);
-                            $.cookie('name', $('#name_input').val());
-                            $.cookie('last_name', $('#last_name').val());
-                            $.cookie('email', $('#email').val());
-                            $.cookie('phone', $('#phone_input').val());
-                            console.log($('#phone_input').val());
-                            //type = $('input[name="org_type"]:checked').attr('id');
-                            $.cookie('type', $('#school').prop('checked') ? 'school' : $('#school').prop('checked') ? 'organization' : 'not_selected');
-                            console.log($('#school').prop('checked') ? 'school' : 'organization');
-                            console.log($.cookie('type'));
-                            //$.cookie('type', (type === 'school') ? 'school' : (type === 'organization') ? 'organization' : 'not_selected');
-                            $('#code_container').show();
-                        }
-                    })
-                    .fail((jqXHR) => {
-                        if (jqXHR.status === 302) {
-                            $('#password_container').show();
-                            $('#registration_container').hide();
-                            alert('уже есть')
-                        }
-                        if (jqXHR.status === 400) {
-                            alert('Неверная почта. Пожалуйста, попробуйте еще раз.');
-                        }
-                    });
-            }
-        }
-
-        function handleRegister() {
-            const registerType = $('#register_btn').attr('data-type');
-            if (registerType === 'user') {
-                registerUser();
-            } else {
-                registerNotUser();
-            }
-        }
-
-        function delCookie(){
-            $.removeCookie('name');
-            $.removeCookie('last_name');
-            $.removeCookie('email');
-            $.removeCookie('phone');
-            $.removeCookie('type');
-            $.removeCookie('tab');
-        }
-
-        function handleLogin() {
-            var snils = $('#snils').val();
 
             $.ajax({
-                url: '/api/check-user',
+                url: 'http://localhost:3000/auth/admin-login',
                 method: 'POST',
-                data: {
-                    snils: snils
-                },
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    login: login,
+                    password: password
+                }),
                 success: function(response) {
-                    if (response.message === 'Пользователь найден') {
-                        // Пользователь найден, переходим на index.html
-                        window.location.href = '../index.html';
-                    } else {
-                        // Пользователь не найден, выводим ошибку
-                        alert('Неверный СНИЛС!');
-                    }
+                    localStorage.setItem('adminLogin', login);
+                    window.location.href = 'LK_admin.html';
                 },
-                error: function(xhr, status, error) {
-                    console.error(error);
+                error: function(xhr) {
+                    if (xhr.status === 401) {
+                        alert('Неверный логин или пароль');
+                    } else {
+                        alert('Ошибка входа: ' + (xhr.responseJSON?.error || 'Неизвестная ошибка'));
+                    }
                 }
             });
-        }}
+        });
+
+    });
+
+    function showTab(tab) {
+        if (tab === 'login') {
+            $('#password_container').show();
+            $('#admin_container').hide();
+            $('#login_tab').addClass('active');
+            $('#register_tab').removeClass('active');
+        } else if (tab === 'admin') {
+            $('#password_container').hide();
+            $('#admin_container').show();
+            $('#login_tab').removeClass('active');
+            $('#admin_tab').addClass('active');
+            $('#admin_tab').text('Вход администратора');
+        }
+    }
+
+    function handleLogin() {
+        const snils = $('#snils').val().replace(/\D/g, '');
+
+        if (snils.length !== 11) {
+            return alert('СНИЛС должен содержать 11 цифр');
+        }
+
+        $.ajax({
+            url: 'http://localhost:3000/api/check-user',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ snils: snils }),
+            success: function(response) {
+                if (response.message === 'Пользователь найден') {
+                    localStorage.setItem('userSnils', snils);
+                    // Обновляем все страницы
+                    if (window.opener) {
+                        window.opener.postMessage({ type: 'userLoggedIn', snils: snils }, '*');
+                    }
+                    window.location.href = `LK_abiturient.html?snils=${snils}`;
+                } else {
+                    alert('Пользователь не найден');
+                }
+            },
+            error: function(xhr) {
+                console.error('Полная ошибка:', xhr.responseJSON);
+                alert('Ошибка: ' + (xhr.responseJSON?.details || xhr.statusText));
+            }
+        });
+    }
 </script>
 </body>
 </html>

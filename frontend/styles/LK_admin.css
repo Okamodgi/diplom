@@ -1,0 +1,236 @@
+/* Основные стили личного кабинета */
+.lk-container {
+    padding: 2% 5%;
+    color: #333;
+}
+
+.lk-container h1 {
+    color: #060AB3;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.user-card, .actions-card {
+    background-color: white;
+    border-radius: 1vw;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 2rem 2rem;
+    margin-bottom: 2rem;
+}
+
+.user-card {
+    text-align: left;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-around;
+
+}
+
+.user-info {
+
+}
+
+.info-item {
+    margin-top: 0;
+    padding: 0.8rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+}
+
+.info-label {
+    font-weight: bold;
+    color: #060AB3;
+    margin-right: 1rem;
+}
+
+.info-value {
+    color: #333;
+}
+
+.logoutBtn {
+    float: right;
+    margin-top: -0.8rem;
+}
+
+.action-btn {
+    margin-top: 1.5rem;
+}
+
+.action-btn, .logoutBtn {
+    background-color: #060AB3;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-right: 1rem;
+}
+
+.action-btn:hover, .logoutBtn:hover {
+    background-color: #050a9e;
+}
+
+.action-btn.cancel, .logoutBtn.cancel {
+    background-color: #6c757d;
+}
+
+.action-btn.cancel:hover, .logoutBtn.cancel:hover {
+    background-color: #5a6268;
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный чёрный */
+    z-index: 1000; /* Поверх всех элементов */
+    justify-content: center;
+    align-items: center;
+}
+
+.edit-form {
+    position: relative;
+    margin: 2rem auto;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 1vw;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    padding: 2rem;
+    width: 60%;
+    max-width: 600px;
+    z-index: 1001; /* Поверх overlay */
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.users-table {
+    background-color: white;
+    border-radius: 1vw;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+table{
+    margin: auto;
+    width: 70%;
+    border: 0.2rem solid #060AB3;
+    border-radius: 0.5rem;
+    background-color: #060AB3;
+}
+
+td, th{
+    border: 1px solid #060AB3;
+    background-color: white;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+}
+
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    text-align: left;
+    font-weight: bold;
+    color: #060AB3;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.action-btn.small {
+    font-size: 0.8rem;
+    margin: 0.5rem auto;
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-btn {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .form-actions {
+        justify-content: space-between;
+    }
+}
+.specialities-wrapper {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 5px;
+}
+
+.checkbox-list {
+    max-height: 200px;
+    overflow-y: auto;
+    text-align: left;
+
+}
+
+.checkbox-item {
+    padding: 8px 5px;
+    border-bottom: 1px solid #eee;
+    display: inline-flex;
+    align-items: center;
+}
+
+.checkbox-item:last-child {
+    border-bottom: none;
+}
+
+.checkbox-item input {
+    margin-right: 10px;
+    width: fit-content;
+}
+
+.checkbox-item label {
+    text-align: left;
+}
+
+.selected-count {
+    font-size: 14px;
+    color: #666;
+    margin-top: 10px;
+    text-align: right;
+}
+
+.limit-reached {
+    color: #ff4444;
+}

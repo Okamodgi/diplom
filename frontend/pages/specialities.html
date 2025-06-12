@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Специальности</title>
+    <link rel="stylesheet" href="../styles/main_style.css">
+    <link rel="stylesheet" href="../styles/specialities.css">
+    <script src="../scripts/header.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+</head>
+<body>
+<header>
+    <div class="navbar">
+        <div class="logo">
+            <a href="../index.html"><img src="../static/images/PKIPT_logo.png" alt="Логотип ПКИПТ"></a>
+        </div>
+
+        <div class="links">
+            <a href="../pages/info_colleg.html">О колледже</a>
+            <a href="../pages/info_abiturient.html">Для абитуриентов</a>
+            <a href="../pages/connection.html">Связь с нами</a>
+        </div>
+
+        <div class="user-profile">
+            <button></button>
+        </div>
+    </div>
+</header>
+<div class="main">
+    <!-- Таблица специальностей -->
+    <div class="users-table" id="usersTable" >
+        <h2>Список специальностей</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Номер специальности</th>
+                <th>Название специальности</th>
+            </tr>
+            </thead>
+            <tbody id="specList">
+            <!-- Данные будут загружаться здесь -->
+            </tbody>
+        </table>
+    </div>
+</div>
+<footer>
+    <div class="footer-content">
+        <p>© 2025 ГАПОУ ПО ПКИПТ</p>
+    </div>
+</footer>
+<script>
+    $(document).ready(function() {
+
+        // Загрузка списка абитуриентов
+        function loadUsersList() {
+            $.get('http://localhost:3000/api/specialities')
+                .done(function(data) {
+                    const tbody = $('#specList').empty();
+                    data.forEach(spec => {
+                        tbody.append(`
+                            <tr>
+                                <td>${spec.num_code || 'Не указано'}</td>
+                                <td class="specName">${spec.name_spec || 'Не указан'}</td>
+                            </tr>
+                        `);
+                    });
+                })
+                .fail(function() {
+                    alert('Ошибка загрузки списка специальностей');
+                });
+        }
+
+        loadUsersList();
+
+
+    });
+</script>
+</body>
+
+</html>

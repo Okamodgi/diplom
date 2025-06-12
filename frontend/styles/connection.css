@@ -1,16 +1,28 @@
-p{
-    padding-top: 10%;
-    text-align:center;
-    line-height: inherit;
+.inf-container{
+    padding-bottom: 0.1%;
+    height: 90%;
+    text-align: justify;
 }
-.adres{
-    padding-top: 5%;
-    text-align:left;
+
+.inf-container > p{
     line-height: inherit;
-    padding-left: 20%;
+    width: fit-content;
+    margin: auto;
+    font-weight: bold;
+}
+
+.info{
+    padding-top: 3%;
+    text-align: center;
+}
+
+.adres{
+    padding-top: 3%;
+    text-align: left;
 }
 .map{
-    margin-left: 25%;
-    margin-right: 25%;
-
+    width: fit-content;
+    padding-top: 3%;
+    padding-bottom: 3%;
+    margin: auto;
 }

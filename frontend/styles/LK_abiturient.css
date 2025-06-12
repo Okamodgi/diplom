@@ -1,0 +1,132 @@
+/* Основные стили личного кабинета */
+.lk-container {
+    padding: 2% 5%;
+    color: #333;
+}
+
+.lk-container h1 {
+    color: #060AB3;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.user-card, .actions-card {
+    background-color: white;
+    border-radius: 1vw;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.user-card {
+    text-align: left;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-around;
+
+}
+
+.user-info {
+    margin-bottom: 1.5rem;
+}
+
+.info-item {
+    margin-bottom: 1rem;
+    padding: 0.8rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+}
+
+.info-label {
+    font-weight: bold;
+    color: #060AB3;
+    margin-right: 1rem;
+}
+
+.info-value {
+    color: #333;
+}
+
+.logoutBtn {
+    float: right;
+}
+
+.action-btn, .logoutBtn {
+    background-color: #060AB3;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-right: 1rem;
+}
+
+.action-btn:hover, .logoutBtn:hover {
+    background-color: #050a9e;
+}
+
+.action-btn.cancel, .logoutBtn.cancel {
+    background-color: #6c757d;
+}
+
+.action-btn.cancel:hover, .logoutBtn.cancel:hover {
+    background-color: #5a6268;
+}
+
+.edit-form {
+    background-color: white;
+    border-radius: 1vw;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #060AB3;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-btn {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .form-actions {
+        justify-content: space-between;
+    }
+}

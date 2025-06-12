@@ -6,12 +6,12 @@
     <title>Абитуриент_ГАПОУ по ПКИПТ</title>
     <link rel="stylesheet" href="styles/main_style.css">
     <link rel="stylesheet" href="styles/index.css">
-
+    <script src="scripts/header.js"></script>
 </head>
 <header>
     <div class="navbar">
         <div class="logo">
-            <img src="static/images/PKIPT_logo.png" alt="">
+            <a href=""><img src="static/images/PKIPT_logo.png" alt=""></a>
         </div>
 
         <div class="links">
@@ -35,25 +35,20 @@
         <div class="card" id="c2">
             <img src="static/images/c2_bg.png">
         </div>
-        <!--
+
         <div class="card" id="c3">
             <img src="static/images/c1_bg.png">
         </div><div class="card" id="c4">
             <img src="static/images/c1_bg.png">
         </div>
-        -->
+
     </div>
 </div>
 </body>
 <footer>
-
+    <div class="footer-content">
+        <p>© 2025 ГАПОУ ПО ПКИПТ</p>
+    </div>
 </footer>
 </html>
-<script> 
-    $(document).ready(function() {
-    $('.back_btn').on('click', function() {
-        console.log("Кнопка нажата");
-        window.location.href = '../index.html';
-    });
-});
-</script>
+

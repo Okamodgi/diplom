@@ -85,14 +85,14 @@ body {
     transform: translate(-50%, -50%);
     box-shadow: 0 10px 40px rgba(105, 179, 231, 55%);
 }
-#login_tab, #register_tab{
+#login_tab, #admin_tab{
     font-size: 20px;
     background-color: transparent;
     border: none;
     transition: 0.3s ease;
     cursor: pointer;
 }
-#login_tab:hover, #register_tab:hover{
+#login_tab:hover, #admin_tab:hover{
     color: #060AB3;
 }
 
@@ -152,7 +152,7 @@ button:hover{
     background-color: white;
     color: #060AB3;
 }
-.password-container, .registration-container {
+.password-container, .admin-container {
     display: none;
 }
 .radio-group {
@@ -164,22 +164,8 @@ button:hover{
     margin-right: 20px; /* Отступ между радиокнопками */
 }
 
-.checkbox-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 10px 0;
-    font-size: 2px;
-}
-
-.checkbox-container input[type="checkbox"] {
-    width: auto;
-    margin: 0;
-}
-
-.checkbox-container label {
-    font-size: 16px;
-    color: #333;
+.back_btn:hover {
+    cursor: pointer;
 }
 
 @media (max-width: 768px) {

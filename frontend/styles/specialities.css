@@ -1,0 +1,28 @@
+.users-table{
+    padding-bottom: 2rem;
+}
+
+.specName{
+    text-align: left;
+}
+
+table{
+    margin: auto;
+    width: 70%;
+    border: 0.2rem solid #060AB3;
+    border-radius: 0.5rem;
+    background-color: #060AB3;
+}
+
+td, th{
+    border: 1px solid #060AB3;
+    background-color: white;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+}
+
+h2{
+    margin-top: 0;
+    padding-top: 1rem;
+    color: #060AB3;
+}

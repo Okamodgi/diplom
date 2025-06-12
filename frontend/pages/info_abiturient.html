@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Для абитуриентов</title>
-    <link rel="stylesheet" href="../styles/info_abiturient.css">
     <link rel="stylesheet" href="../styles/main_style.css">
+    <link rel="stylesheet" href="../styles/info_abiturient.css">
 
+    <script src="../scripts/header.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 </head>
 <header>
     <div class="navbar">
         <div class="logo">
-            <img src="../static/images/PKIPT_logo.png" alt="">
+            <a href="../index.html"><img src="../static/images/PKIPT_logo.png" alt=""></a>
         </div>
 
         <div class="links">
@@ -32,9 +33,44 @@
 
 <div class="main">
     <div class="card-container">
-
+        <div class="card" id="c1">
+            <p>Специальности</p>
+        </div>
+        <div class="card" id="c2">
+            <p>Стоимость</p>
+        </div>
+        <div class="card" id="c3">
+            <p>Правила и условия приёма</p>
+        </div>
+        <div class="card" id="c4">
+            <p>Документы и справки</p>
+        </div>
     </div>
 </div>
 </body>
-
+<footer>
+    <div class="footer-content">
+        <p>© 2025 ГАПОУ ПО ПКИПТ</p>
+    </div>
+</footer>
+<script>
+    $(document).ready(function() {
+        $(c1).on('click', function() {
+            console.log("Кнопка нажата");
+            window.location.href = 'specialities.html';
+        });
+        $(c2).on('click', function() {
+            console.log("Кнопка нажата");
+            window.location.href = '../index.html';
+        });
+        $(c3).on('click', function() {
+            console.log("Кнопка нажата");
+            window.location.href = '../index.html';
+        });
+        $(c4).on('click', function() {
+            console.log("Кнопка нажата");
+            window.location.href = 'documents.html';
+        });
+    });
+</script>
 </html>
