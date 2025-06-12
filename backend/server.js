@@ -283,7 +283,7 @@ app.post('/auth/verification_code', async (req, res) => {
 // Регистрация нового пользователя
 app.post('/auth/register', async (req, res) => {
     try {
-        const { snils, full_name, email, phone, average_score, specialities } = req.body;
+        const { snils, full_name, email, phone, attestat, specialities } = req.body;
 
         // Проверяем код подтверждения
         // const storedData = tempCodes.get(email);
@@ -312,18 +312,18 @@ app.post('/auth/register', async (req, res) => {
         // Регистрируем пользователя
         const result = await pool.query(
             'INSERT INTO public.abiturients (fio, snils, number_t, attestat) VALUES ($1, $2, $3, $4) RETURNING *',
-            [full_name, snils, phone, average_score]
+            [full_name, snils, phone, attestat]
         );
 
         // Добавляем выбранные специальности
-        if (specialities && specialities.length > 0) {
+        /*if (specialities && specialities.length > 0) {
             for (const specId of specialities) {
                 await pool.query(
-                    'INSERT INTO public.abiturient_specialities (snils, speciality_id) VALUES ($1, $2)',
+                    'INSERT INTO public.abiturient_specialities (snils, specId) VALUES ($1, $2)',
                     [snils, specId]
                 );
             }
-        }
+        }*/
 
         // Завершаем транзакцию
         await pool.query('COMMIT');

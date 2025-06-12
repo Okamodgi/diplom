@@ -82,8 +82,8 @@
                             </div>
                             <div id="selected-count" class="selected-count">Выбрано: 0/3</div>
                         </div>
-                        <!-- Скрытый select для совместимости
-                        <select id="specialities" multiple style="display: none;"></select>-->
+                        <!-- Скрытый select для совместимости-->
+                        <select id="specialities" multiple style="display: none;"></select>
                     </div>
                     <div class="form-actions">
                         <!-- Упрощенная форма добавления<button id="send_code_btn" class="action-btn">Отправить код на почту</button>-->
@@ -160,7 +160,7 @@
                 .done(function(data) {
                     console.log("Получены данные:", data);
                     const container = $('#checkbox-specialities').empty();
-                    //const select = $('#specialities').empty();
+                    const select = $('#specialities').empty();
 
                     if (data.length === 0) {
                         container.append('<div class="no-specialities">Нет доступных специальностей</div>');
@@ -169,7 +169,7 @@
 
                     data.forEach(spec => {
                         // Добавляем в скрытый select
-                        //select.append(`<option value="${spec.id}">${spec.name}</option>`);
+                        select.append(`<option value="${spec.id}">${spec.name}</option>`);
 
                         // Добавляем чекбоксы
                         container.append(`
@@ -241,43 +241,6 @@
             window.location.href = '../index.html';
         });
 
-
-        // Добавление нового абитуриента
-        /*$('#confirm_code_btn').on('click', function() {
-            const email = $('#email').val();
-            const verification_code = $('#verification_code').val();
-
-            if (!email || !verification_code) {
-                return alert('Пожалуйста, введите email и код подтверждения');
-            }
-
-            $.ajax({
-                url: 'http://localhost:3000/auth/verification_code',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    email: email,
-                    verification_code: verification_code
-                }),
-                success: function(data, status, jqXHR) {
-                    if (jqXHR.status === 200) {
-                        //$('#finalize_container').show();
-                        handleRegister();
-                        $('#modalOverlay').hide();
-                    }
-                },
-                error: function(jqXHR) {
-                    if (jqXHR.status === 403) {
-                        alert('Неверный код. Пожалуйста, попробуйте еще раз.');
-                        $('#verification_code').val('');
-                    } else if (jqXHR.status === 400) {
-                        alert(jqXHR.responseJSON.error || 'Необходимо указать email и код подтверждения');
-                    } else {
-                        alert('Произошла ошибка. Пожалуйста, попробуйте позже.');
-                    }
-                }
-            });
-        });*/
         $('#confirmAddBtn').click(function() {
             handleRegister();
         });
@@ -324,65 +287,18 @@
             return true;
         }
 
-        /*
-        function sendCode() {
-            const email = $('#email').val();
-            if (!email) {
-                return alert('Пожалуйста, введите email');
-            }
-
-            if (validateFields()) {
-                $.ajax({
-                    url: 'http://localhost:3000/auth/mail',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        email: email,
-                        snils: $('#snils_input').val(),
-                        full_name: $('#full_name').val(),
-                        phone: $('#phone').val(),
-                        average_score: $('#average_score').val(),
-                        specialities: $('#specialities').val()
-                    }),
-                    success: function(data, status, jqXHR) {
-                        if (jqXHR.status === 201) {
-                            $.cookie('tab', 'registration');
-                            $.cookie('snils', $('#snils_input').val());
-                            $.cookie('full_name', $('#full_name').val());
-                            $.cookie('phone', $('#phone').val());
-                            $.cookie('email', email);
-                            $.cookie('average_score', $('#average_score').val());
-                            $.cookie('specialities', JSON.stringify($('#specialities').val()));
-                            $('#start_container').hide();
-                            $('#code_container').show();
-                            alert('Код подтверждения отправлен на ваш email');
-                        }
-                    },
-                    error: function(jqXHR) {
-                        // ... существующий обработчик ошибок ...
-                    }
-                });
-            }
-        }*/
-
         function handleRegister() {
             if (!validateFields()) return;
 
             const email = $('#email').val();
-            //const verification_code = $('#verification_code').val();
             const snils = $('#snils_input').val().replace(/\D/g, '');
             const full_name = $('#full_name').val();
             const phone = $('#phone').val();
             const attestat = $('#average_score').val().toString();
             const specialities = $('#specialities').val();
 
-            /*if (!email || !verification_code) {
-                return alert('Пожалуйста, введите email и код подтверждения');
-            }*/
-
             $.ajax({
                 url: 'http://localhost:3000/auth/register',
-                //url: 'http://localhost:3000/api/add-abiturient',
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
@@ -390,7 +306,6 @@
                     full_name: full_name,
                     phone: phone,
                     email: email,
-                    //verification_code: verification_code,
                     attestat: attestat,
                     specialities: specialities
                 }),
