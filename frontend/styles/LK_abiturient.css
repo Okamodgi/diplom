@@ -54,6 +54,16 @@
     float: right;
 }
 
+.actions-card {
+    display: flex;
+    justify-content: space-around;
+}
+
+#sp1, #sp2, #sp3{
+    width: 30%;
+    height: 6rem;
+}
+
 .action-btn, .logoutBtn {
     background-color: #060AB3;
     color: white;

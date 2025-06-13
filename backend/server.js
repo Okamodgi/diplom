@@ -108,6 +108,29 @@ app.get('/api/specialities', async (req, res) => {
     }
 });
 
+// Получение всех абитуриентов для клиентского ранжирования
+app.get('/api/all-applicants', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT
+                fio,
+                snils,
+                number_t,
+                attestat,
+                spec1,
+                spec2,
+                spec3
+            FROM abiturients
+            ORDER BY attestat DESC
+        `);
+
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error('Ошибка при получении абитуриентов:', err.stack);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
 // Проверка пользователя (авторизация)
 app.post('/api/check-user', async (req, res) => {
     try {
@@ -136,7 +159,7 @@ app.get('/api/LK_abiturient/:snils', async (req, res) => {
     try {
         const { snils } = req.params;
         const result = await pool.query(
-            `SELECT fio, snils, number_t 
+            `SELECT fio, snils, number_t, spec1, spec2, spec3
              FROM public.abiturients 
              WHERE snils = $1`,
             [snils]
@@ -207,79 +230,6 @@ app.post('/auth/admin-login', async (req, res) => {
     }
 });
 
-// Генерация случайного кода подтверждения
-function generateVerificationCode() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-// Хранилище для временных кодов подтверждения (в реальном проекте используйте Redis или БД)
-const tempCodes = new Map();
-
-// Отправка кода подтверждения на email
-app.post('/auth/mail', async (req, res) => {
-    try {
-        const { email, snils, full_name, phone, average_score, specialities } = req.body;
-
-        // Проверка, что пользователь с таким СНИЛС уже не зарегистрирован
-        const existingUser = await pool.query(
-            'SELECT * FROM public.abiturients WHERE snils = $1',
-            [snils]
-        );
-
-        if (existingUser.rowCount > 0) {
-            return res.status(302).json({ error: 'Пользователь с таким СНИЛС уже зарегистрирован' });
-        }
-
-        // Генерируем код подтверждения
-        const code = generateVerificationCode();
-        tempCodes.set(email, { code, snils, full_name, phone });
-
-        // Настройки письма
-        const mailOptions = {
-            from: '"Ferificator" <sleepok00@gmail.com>',
-            to: email,
-            subject: 'Код подтверждения для регистрации',
-            text: `Ваш код: ${code}`,
-            html: `
-        <h2>Подтверждение регистрации</h2>
-        <p>Ваш код подтверждения: <strong>${code}</strong></p>
-        <p>Если вы не запрашивали этот код, проигнорируйте письмо.</p>
-      `,
-        };
-
-        // Отправка
-        await transporter.sendMail(mailOptions);
-        console.log(`Письмо с кодом отправлено на ${email}`);
-        res.status(201).json({ message: 'Код подтверждения отправлен' });
-    } catch (error) {
-        console.error('Ошибка при отправке кода:', error.stack);
-        res.status(500).json({ error: 'Ошибка сервера' });
-    }
-});
-
-// Проверка кода подтверждения
-app.post('/auth/verification_code', async (req, res) => {
-    try {
-        const { verification_code, email } = req.body;
-
-        if (!email || !verification_code) {
-            return res.status(400).json({ error: 'Необходимо указать email и код подтверждения' });
-        }
-
-        // Проверяем, что код верный
-        const storedData = tempCodes.get(email);
-        if (!storedData || storedData.code !== verification_code) {
-            return res.status(403).json({ error: 'Неверный код подтверждения' });
-        }
-
-        // Если код верный, разрешаем регистрацию
-        res.status(200).json({ message: 'Код подтвержден' });
-    } catch (error) {
-        console.error('Ошибка при проверке кода:', error.stack);
-        res.status(500).json({ error: 'Ошибка сервера' });
-    }
-});
-
 // Регистрация нового пользователя
 app.post('/auth/register', async (req, res) => {
     try {
@@ -311,25 +261,13 @@ app.post('/auth/register', async (req, res) => {
 
         // Регистрируем пользователя
         const result = await pool.query(
-            'INSERT INTO public.abiturients (fio, snils, number_t, attestat) VALUES ($1, $2, $3, $4) RETURNING *',
-            [full_name, snils, phone, attestat]
+            'INSERT INTO public.abiturients (fio, snils, number_t, attestat, spec1, spec2, spec3) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            [full_name, snils, phone, attestat, specialities[0], specialities[1], specialities[2]]
         );
 
-        // Добавляем выбранные специальности
-        /*if (specialities && specialities.length > 0) {
-            for (const specId of specialities) {
-                await pool.query(
-                    'INSERT INTO public.abiturient_specialities (snils, specId) VALUES ($1, $2)',
-                    [snils, specId]
-                );
-            }
-        }*/
 
         // Завершаем транзакцию
         await pool.query('COMMIT');
-
-        // Удаляем использованный код
-        //tempCodes.delete(email);
 
         res.status(201).json({
             message: 'Регистрация успешно завершена',

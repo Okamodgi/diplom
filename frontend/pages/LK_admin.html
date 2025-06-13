@@ -72,7 +72,7 @@
                     </div>
                     <div class="form-group">
                         <label for="average_score">Средний балл аттестата:</label>
-                        <input type="number" id="average_score" min="1" max="5" step="0.1" placeholder="Введите средний балл" required>
+                        <input type="number" id="average_score" min="2" max="5" step="0.1" placeholder="Введите средний балл" required>
                     </div>
                     <div class="form-group">
                         <label>Выберите специальности (максимум 3):</label>
@@ -82,8 +82,6 @@
                             </div>
                             <div id="selected-count" class="selected-count">Выбрано: 0/3</div>
                         </div>
-                        <!-- Скрытый select для совместимости-->
-                        <select id="specialities" multiple style="display: none;"></select>
                     </div>
                     <div class="form-actions">
                         <!-- Упрощенная форма добавления<button id="send_code_btn" class="action-btn">Отправить код на почту</button>-->
@@ -137,22 +135,6 @@
             $('#usersTable').hide();
             loadSpecialities();
         });
-        // Ограничение выбора специальностей
-        $('#specialities').change(function() {
-            const selected = $(this).val() || [];
-            if (selected.length > 3) {
-                alert('Можно выбрать не более 3 специальностей');
-                $(this).val(selected.slice(0, 3));
-            }
-            updateSelectedSpecialitiesDisplay();
-        });
-
-        function updateSelectedSpecialitiesDisplay() {
-            const selected = $('#specialities').val() || [];
-            $('#selectedSpecialities').html(
-                selected.map(spec => `<div>${spec}</div>`).join('')
-            );
-        }
 
         function loadSpecialities() {
             console.log("Загрузка специальностей...");
@@ -160,7 +142,6 @@
                 .done(function(data) {
                     console.log("Получены данные:", data);
                     const container = $('#checkbox-specialities').empty();
-                    const select = $('#specialities').empty();
 
                     if (data.length === 0) {
                         container.append('<div class="no-specialities">Нет доступных специальностей</div>');
@@ -168,9 +149,6 @@
                     }
 
                     data.forEach(spec => {
-                        // Добавляем в скрытый select
-                        select.append(`<option value="${spec.id}">${spec.name}</option>`);
-
                         // Добавляем чекбоксы
                         container.append(`
                     <div class="checkbox-item">
@@ -214,8 +192,6 @@
                 $('.spec-checkbox').prop('disabled', false);
             }
 
-            // Синхронизация с select
-            $('#specialities').val(selected);
         }
 
         // Отображение логина
@@ -243,6 +219,20 @@
 
         $('#confirmAddBtn').click(function() {
             handleRegister();
+        });
+
+        document.getElementById('average_score').addEventListener('input', function() {
+            if ($('#average_score').val() > 5) {
+                $('#average_score').val(5);
+            } else if ($('#average_score').val() < 2) {
+                $('#average_score').val(2);
+            }
+        });
+
+        document.getElementById('snils_input').addEventListener('input', function() {
+            if ($('#snils_input').val().trim().length > 11) {
+                alert("Введите корректный СНИЛС!");
+            }
         });
 
         // Загрузка списка абитуриентов
@@ -295,7 +285,12 @@
             const full_name = $('#full_name').val();
             const phone = $('#phone').val();
             const attestat = $('#average_score').val().toString();
-            const specialities = $('#specialities').val();
+            const specialities = [];
+            $('.spec-checkbox:checked').each(function() {
+                // Получаем текст из соседнего label
+                const specName = $(this).next('label').text();
+                specialities.push(specName);
+            });
 
             $.ajax({
                 url: 'http://localhost:3000/auth/register',
@@ -311,6 +306,7 @@
                 }),
                 success: function(data, status, jqXHR) {
                     if (jqXHR.status === 201) {
+                        console.log(specialities)
                         $.removeCookie('tab');
                         $.removeCookie('snils');
                         $.removeCookie('full_name');

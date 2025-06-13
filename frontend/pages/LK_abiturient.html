@@ -64,14 +64,18 @@
             </div>
         </div>
 
-        <div class="actions-card">
-            <h2>Действия</h2>
-            <div class="action-buttons">
-                <button class="action-btn">Подать заявление</button>
-                <button class="action-btn">Проверить статус</button>
-                <button class="action-btn">Мои документы</button>
-            </div>
+        <div class="actions-card" id="actions-cards">
+            <h2>Выбранные специальности</h2>
+
         </div>
+        <table class="spec-table">
+            <thead id="spec-head">
+
+            </thead>
+            <tbody id="spec-body">
+
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -101,6 +105,25 @@
                     $('#userSnils').text(data.snils || 'Не указан');
                     $('#userPhone').text(data.number_t || 'Не указан');
                     $('#editPhone').val(data.number_t || '');
+                    const cards = $('#actions-cards').empty();
+                    cards.find('button').remove(); // Очищаем предыдущие кнопки
+
+                    // Создаем кнопки для каждой специальности
+                    if (data.spec1) {
+                        cards.append(`<button class="action-btn spec-btn" data-spec="${data.spec1}">${data.spec1}</button>`);
+                    }
+                    if (data.spec2) {
+                        cards.append(`<button class="action-btn spec-btn" data-spec="${data.spec2}">${data.spec2}</button>`);
+                    }
+                    if (data.spec3) {
+                        cards.append(`<button class="action-btn spec-btn" data-spec="${data.spec3}">${data.spec3}</button>`);
+                    }
+
+                    // Вешаем обработчики на все кнопки специальностей
+                    $('.spec-btn').click(function() {
+                        const spec = $(this).data('spec');
+                        loadApplicantsBySpecialty(spec);
+                    });
                 })
                 .fail(function() {
                     alert('Ошибка загрузки данных пользователя');
@@ -110,7 +133,72 @@
         // Инициализация
         loadUserData();
 
+        function loadApplicantsBySpecialty(specialty) {
+            $.get('http://localhost:3000/api/all-applicants')
+                .done(function(allApplicants) {
+                    const thead = $('#spec-head').empty();
+                    const tbody = $('#spec-body').empty();
+
+                    // Добавляем заголовки
+                    thead.append(`
+                <tr>
+                    <th>Место</th>
+                    <th>ФИО</th>
+                    <th>Балл</th>
+                    <th>Приоритет</th>
+                </tr>
+            `);
+
+                    // Фильтруем абитуриентов по выбранной специальности
+                    const filteredApplicants = allApplicants.filter(applicant =>
+                        applicant.spec1 === specialty ||
+                        applicant.spec2 === specialty ||
+                        applicant.spec3 === specialty
+                    );
+
+                    if (filteredApplicants.length === 0) {
+                        tbody.append('<tr><td colspan="4">Нет абитуриентов по этой специальности</td></tr>');
+                        return;
+                    }
+
+                    // Преобразуем attestat в число и сортируем по баллам (по убыванию)
+                    filteredApplicants.sort((a, b) => {
+                        const aScore = parseFloat(a.attestat.replace(',', '.')) || 0; // Заменяем запятую на точку для корректного парсинга
+                        const bScore = parseFloat(b.attestat.replace(',', '.')) || 0;
+                        return bScore - aScore;
+                    });
+
+                    // Добавляем ранжирование
+                    filteredApplicants.forEach((applicant, index) => {
+                        // Определяем приоритет специальности для этого абитуриента
+                        let appliedAs = '';
+                        if (applicant.spec1 === specialty) appliedAs = '1';
+                        else if (applicant.spec2 === specialty) appliedAs = '2';
+                        else if (applicant.spec3 === specialty) appliedAs = '3';
+
+                        const isCurrent = applicant.snils === snils;
+                        tbody.append(`
+                    <tr ${isCurrent ? 'class="current-user"' : ''}>
+                        <td>${index + 1}</td>
+                        <td>${applicant.fio} ${isCurrent ? '(Вы)' : ''}</td>
+                        <td>${applicant.attestat}</td>
+                        <td>${appliedAs}</td>
+                    </tr>
+                `);
+                    });
+                })
+                .fail(function(jqXHR, textStatus, error) {
+                    console.error("Ошибка запроса:", textStatus, error);
+                    alert('Ошибка загрузки данных: ' + error);
+                });
+        }
+
         // Обработчики кнопок
+
+        // $('#sp1').click(function() {
+        //     loadApplicantsBySpecialty($('#sp1').text());
+        // })
+
         $('#editBtn').click(function() {
             $('.user-card').hide();
             $('#editForm').show();
